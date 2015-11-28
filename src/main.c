@@ -7,7 +7,7 @@ TextLayer *text_layer;
 static int s_uptime = 0; //Timer using tick_handler
 static int start = 0; //Start/stop the timer
 static int period = -1;
-static int pv = 4;
+static int pv = 4; //Change Period Value Here
 static int index =0;
 static int accarray[50][3];
 static int i=0;
@@ -82,10 +82,10 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
        accarray[index][1] = data[i].y;
        accarray[index][2] = data[i].z;
        
-       printf("abcd x:%d y:%d z:%d",accarray[index][0],accarray[index][1],accarray[index][2]);
+      // printf("abcd x:%d y:%d z:%d",accarray[index][0],accarray[index][1],accarray[index][2]);
        
     }
-   printf("period:%d",period);
+   //printf("period:%d",period);
   }
   /*
    Long lived buffer
