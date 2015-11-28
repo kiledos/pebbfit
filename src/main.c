@@ -6,12 +6,16 @@ TextLayer *text_layer;
 
 static int s_uptime = 0; //Timer using tick_handler
 static int start = 0; //Start/stop the timer
+static int period = 0;
+static int pv = 5;
+
+static int accarray[25][3];
+static int i=0;
 
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
- text_layer_set_text(s_time_layer, "Workout start");
- 
- start = 1;
+ text_layer_set_text(s_time_layer, "Workout start"); 
+ start = 0;
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -46,6 +50,41 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   // Increment s_uptime
   if (start==1)
     s_uptime++;
+  printf("period:%d",period);
+  if(period<pv)
+  {
+    period++;
+  }    
+  else
+  {
+    //run checkHi/low function
+    period=0;
+  }
+}
+
+static void data_handler(AccelData *data, uint32_t num_samples) {
+  
+  for(i=0;i<5;i++)
+  {
+     accarray[i+period*5][0] = data[i].x;
+     accarray[i+period*5][1] = data[i].y;
+     accarray[i+period*5][2] = data[i].z;
+     
+     printf("abcd x:%d y:%d z:%d",accarray[i][0],accarray[i][1],accarray[i][2]);
+     
+  }
+  
+  /* Long lived buffer
+  static char s_buffer[128];
+  
+  // Compose string of all data for 3 samples
+  snprintf(s_buffer, sizeof(s_buffer), 
+    "X,Y,Z\n x:%d,y:%d,z:%d", 
+    data[0].x, data[0].y, data[0].z
+  );
+
+  //Show the data
+  printf("%s",s_buffer);*/
 }
 
 static void main_window_load(Window *window) {
@@ -67,21 +106,6 @@ static void main_window_unload(Window *window) {
 text_layer_destroy(s_time_layer);
 }
 
-static void data_handler(AccelData *data, uint32_t num_samples) {
-  // Long lived buffer
-  static char s_buffer[128];
-
-  // Compose string of all data for 3 samples
-  snprintf(s_buffer, sizeof(s_buffer), 
-    "N X,Y,Z\n0 %d,%d,%d\n1 %d,%d,%d\n2 %d,%d,%d", 
-    data[0].x, data[0].y, data[0].z, 
-    data[1].x, data[1].y, data[1].z, 
-    data[2].x, data[2].y, data[2].z
-  );
-
-  //Show the data
-  printf("%s",s_buffer);
-}
 
 void init(void) {
   s_main_window = window_create();  
@@ -96,14 +120,15 @@ void init(void) {
   //Register click handlers
   window_set_click_config_provider(s_main_window, click_config_provider);
   
-  //Start accel service
-  uint32_t num_samples = 3;  
+  //Start accel service  
+  uint32_t num_samples = 5;  
   accel_data_service_subscribe(num_samples, data_handler);
   accel_service_set_sampling_rate(ACCEL_SAMPLING_10HZ);
 }
 
-
-void deinit(void) {
+void deinit(void) {  
+   tick_timer_service_unsubscribe();  
+   accel_data_service_unsubscribe();
   text_layer_destroy(text_layer);
   window_destroy(s_main_window);
 }
