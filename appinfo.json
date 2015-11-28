@@ -11,6 +11,9 @@
     },
     "sdkVersion": "3",
     "shortName": "Pebble Fitness",
+    "targetPlatforms": [
+        "aplite"
+    ],
     "uuid": "2307f460-8762-4b59-8c77-4bae0ec2b29b",
     "versionLabel": "1.0",
     "watchapp": {
