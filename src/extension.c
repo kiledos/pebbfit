@@ -113,7 +113,7 @@ int highsession(int16_t **list){
   
  
   onecount = onecount + Pqualifier(list);
-  zerocount = zerocount + Pqualifier(list);
+  zerocount = zerocount + (~Pqualifier(list));
   
   if((last==mode)&&(mode==1)){
     consecutivehi = consecutivehi + Pqualifier(list);
@@ -122,26 +122,35 @@ int highsession(int16_t **list){
     consecutivelo = consecutivelo + ~Pqualifier(list);
   }
   if ((last!=mode)&&(mode==1)){
+    last = mode;
     consecutivehi =0;
     
   }
   if ((last!=mode)&&(mode==0)){
+    last =mode;
     consecutivelo = 0;
     
   }
-  if ((onecount==7)&&(consecutivelo<7)){
+  if (consecutivelo>=5){
     onecount =0;
-    return 1;
+    return 0;
     
   }
-  if ((zerocount==7)&&(consecutivehi<7)){
+  if (consecutivehi>=7){
+    onecount = 0;
     zerocount =0;
-    return 0;
-  }
-  if ((onecount==7)&&(consecutivelo<3)){
     return 1;
   }
-  if ((zerocount==7)&&(consecutivehi)<3){
+  if ((onecount==7)&&(consecutivelo<6)){
+    onecount =0;
+    
+    return 1;
+  }
+  if ((zerocount==7)&&(consecutivehi)<6){
+    onecount = 0;
+    zerocount = 0;
+    
+    
     return 0;
     
   }
