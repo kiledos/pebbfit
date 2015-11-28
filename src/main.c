@@ -7,9 +7,9 @@ TextLayer *text_layer;
 static int s_uptime = 0; //Timer using tick_handler
 static int start = 0; //Start/stop the timer
 static int period = -1;
-static int pv = 5;
+static int pv = 4;
 static int index =0;
-static int accarray[25][3];
+static int accarray[50][3];
 static int i=0;
 
 
@@ -20,6 +20,7 @@ static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   s_uptime = 0;
+  period = 0;
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -49,13 +50,13 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
         
     period=0;
     int i;
-    
-    for (i=0;i<25;i++){
+    //
+    /*for (i=0;i<25;i++){
       realloc(accarray[i],0);
-    }
-    free(accarray);
+    }*/
+    //realloc(accarray,N);
   }
-  printf("period:%d",period);
+  
   // Use a long-lived buffer
   static char s_uptime_buffer[32];
   
@@ -72,21 +73,22 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void data_handler(AccelData *data, uint32_t num_samples) {
-  if (start==1)
+ if (start==1)
   {
-    for(i=0;i<5;i++)
+    for(i=0;i<10;i++)
     {
-       index = i + (period*5);
-       accarray[i+ period*5][0] = data[i].x;
-       accarray[i+ period*5][1] = data[i].y;
-       accarray[i+period*5][2] = data[i].z;
+       index = i + (period*10);
+       accarray[index][0] = data[i].x;
+       accarray[index][1] = data[i].y;
+       accarray[index][2] = data[i].z;
        
-       printf("abcd x:%d y:%d z:%d",accarray[i+period*5][0],accarray[i+period*5][1],accarray[i+period*5][2]);
+       printf("abcd x:%d y:%d z:%d",accarray[index][0],accarray[index][1],accarray[index][2]);
        
     }
+   printf("period:%d",period);
   }
-  
-  /* Long lived buffer
+  /*
+   Long lived buffer
   static char s_buffer[128];
   
   // Compose string of all data for 3 samples
@@ -133,7 +135,7 @@ void init(void) {
   window_set_click_config_provider(s_main_window, click_config_provider);
   
   //Start accel service  
-  uint32_t num_samples = 5;  
+  uint32_t num_samples = 10;  
   accel_data_service_subscribe(num_samples, data_handler);
   accel_service_set_sampling_rate(ACCEL_SAMPLING_10HZ);
   tick_timer_service_subscribe(SECOND_UNIT, tick_handler); 
