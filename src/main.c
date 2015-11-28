@@ -1,16 +1,20 @@
 #include <pebble.h>
+#include "extension.h"
 
 static Window *s_main_window;
 static TextLayer *s_time_layer;
 TextLayer *text_layer;
+//static int past[5] ={0,0,0,0,0};
+//static int future[5]={0,0,0,0,0}
 
 static int s_uptime = 0; //Timer using tick_handler
 static int start = 0; //Start/stop the timer
 static int period = -1;
-static int pv = 4; //Change Period Value Here
+static int pv = 1; //Change Period Value Here
 static int index =0;
-static int accarray[50][3];
+static int accarray[20][3];
 static int i=0;
+static int a[3]={1,2,3};
 
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -43,7 +47,8 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   if(period<pv)
   {
     period++;
-  }    
+  }
+  
   else
   {
     //run checkHi/low function
@@ -85,6 +90,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
       // printf("abcd x:%d y:%d z:%d",accarray[index][0],accarray[index][1],accarray[index][2]);
        
     }
+    
    //printf("period:%d",period);
   }
   /*
@@ -148,7 +154,8 @@ void deinit(void) {
   window_destroy(s_main_window);
 }
 
-int main(void) {
+int main(void){
+  printsomething(a,3);
   init();
   app_event_loop();
   deinit();
