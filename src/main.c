@@ -6,7 +6,7 @@ TextLayer *text_layer;
 
 static int s_uptime = 0; //Timer using tick_handler
 static int start = 0; //Start/stop the timer
-static int period = 0;
+static int period = -1;
 static int pv = 5;
 static int index =0;
 static int accarray[25][3];
@@ -46,8 +46,14 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   else
   {
     //run checkHi/low function
-    free(accarray);    
+        
     period=0;
+    int i;
+    
+    for (i=0;i<25;i++){
+      realloc(accarray[i],0);
+    }
+    free(accarray);
   }
   printf("period:%d",period);
   // Use a long-lived buffer
