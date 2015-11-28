@@ -4,7 +4,29 @@ static Window *s_main_window;
 static TextLayer *s_time_layer;
 TextLayer *text_layer;
 
-static int s_uptime = 0;
+static int s_uptime = 0; //Timer using tick_handler
+static int start = 0; //Start/stop the timer
+
+static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
+ text_layer_set_text(s_time_layer, "Workout start");
+ start = 1;
+}
+
+static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
+  s_uptime = 0;
+}
+
+static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
+  text_layer_set_text(s_time_layer, "Workout Finished");
+  start = 0;
+}
+
+static void click_config_provider(void *context) {
+  // Register the ClickHandlers
+  window_single_click_subscribe(BUTTON_ID_UP, up_click_handler);
+  window_single_click_subscribe(BUTTON_ID_SELECT, select_click_handler);
+  window_single_click_subscribe(BUTTON_ID_DOWN, down_click_handler);
+}
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   // Use a long-lived buffer
@@ -20,7 +42,8 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   text_layer_set_text(s_time_layer, s_uptime_buffer);
 
   // Increment s_uptime
-  s_uptime++;
+  if (start==1)
+    s_uptime++;
 }
 
 static void main_window_load(Window *window) {
@@ -29,13 +52,14 @@ static void main_window_load(Window *window) {
 
   // Create the TextLayer with specific bounds
   s_time_layer = text_layer_create(GRect(0,0, bounds.size.w, bounds.size.h));
-   text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
+  text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
   text_layer_set_text(s_time_layer, "Timer: 0h 0m 0s");
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
 
   // Add it as a child layer to the Window's root layer
   layer_add_child(window_layer, text_layer_get_layer(s_time_layer));
 }
+ 
 
 static void main_window_unload(Window *window) {
 text_layer_destroy(s_time_layer);
@@ -51,6 +75,9 @@ void init(void) {
   window_stack_push(s_main_window, true);
   tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
   
+   //Register click handlers
+  window_set_click_config_provider(s_main_window, click_config_provider);
+
 }
 
 void deinit(void) {
