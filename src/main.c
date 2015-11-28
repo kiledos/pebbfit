@@ -8,14 +8,14 @@ static int s_uptime = 0; //Timer using tick_handler
 static int start = 0; //Start/stop the timer
 static int period = 0;
 static int pv = 5;
-
+static int index =0;
 static int accarray[25][3];
 static int i=0;
 
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
  text_layer_set_text(s_time_layer, "Workout start"); 
- start = 0;
+ start = 1;
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -35,22 +35,10 @@ static void click_config_provider(void *context) {
 }
 
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-  // Use a long-lived buffer
-  static char s_uptime_buffer[32];
-  
-  // Get time since launch
-  int seconds = s_uptime % 60;
-  int minutes = (s_uptime % 3600) / 60;
-  int hours = s_uptime / 3600;
-
-  // Update the TextLayer
-  snprintf(s_uptime_buffer, sizeof(s_uptime_buffer), "Timer: %dh %dm %ds", hours, minutes, seconds);
-  text_layer_set_text(s_time_layer, s_uptime_buffer);
-
-  // Increment s_uptime
+ // Increment s_uptime
   if (start==1)
     s_uptime++;
-  printf("period:%d",period);
+  
   if(period<pv)
   {
     period++;
@@ -58,20 +46,38 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   else
   {
     //run checkHi/low function
+    free(accarray);    
     period=0;
   }
+  printf("period:%d",period);
+  // Use a long-lived buffer
+  static char s_uptime_buffer[32];
+  
+  // Get time since launch
+  int seconds = s_uptime % 60;
+  int minutes = (s_uptime % 3600) / 60;
+  int hours = s_uptime / 3600;
+   
+  // Update the TextLayer
+  snprintf(s_uptime_buffer, sizeof(s_uptime_buffer), "Timer: %dh %dm %ds", hours, minutes, seconds);
+  text_layer_set_text(s_time_layer, s_uptime_buffer);
+  
+  
 }
 
 static void data_handler(AccelData *data, uint32_t num_samples) {
-  
-  for(i=0;i<5;i++)
+  if (start==1)
   {
-     accarray[i+period*5][0] = data[i].x;
-     accarray[i+period*5][1] = data[i].y;
-     accarray[i+period*5][2] = data[i].z;
-     
-     printf("abcd x:%d y:%d z:%d",accarray[i][0],accarray[i][1],accarray[i][2]);
-     
+    for(i=0;i<5;i++)
+    {
+       index = i + (period*5);
+       accarray[i+ period*5][0] = data[i].x;
+       accarray[i+ period*5][1] = data[i].y;
+       accarray[i+period*5][2] = data[i].z;
+       
+       printf("abcd x:%d y:%d z:%d",accarray[i+period*5][0],accarray[i+period*5][1],accarray[i+period*5][2]);
+       
+    }
   }
   
   /* Long lived buffer
@@ -115,7 +121,7 @@ void init(void) {
   });
   text_layer = text_layer_create(GRect(0, 0, 144, 20));
   window_stack_push(s_main_window, true);
-  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);  
+   
  
   //Register click handlers
   window_set_click_config_provider(s_main_window, click_config_provider);
@@ -124,6 +130,7 @@ void init(void) {
   uint32_t num_samples = 5;  
   accel_data_service_subscribe(num_samples, data_handler);
   accel_service_set_sampling_rate(ACCEL_SAMPLING_10HZ);
+  tick_timer_service_subscribe(SECOND_UNIT, tick_handler); 
 }
 
 void deinit(void) {  
