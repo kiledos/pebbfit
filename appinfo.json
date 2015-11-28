@@ -1,0 +1,19 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "richardzhang96@gmail.com",
+    "longName": "Pebble Fitness",
+    "projectType": "native",
+    "resources": {
+        "media": []
+    },
+    "sdkVersion": "3",
+    "shortName": "Pebble Fitness",
+    "uuid": "2307f460-8762-4b59-8c77-4bae0ec2b29b",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": false
+    }
+}
