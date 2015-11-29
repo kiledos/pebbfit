@@ -1,10 +1,12 @@
 #pragma once
+//extern int accarray[20][3];
+//int *list = &accarray;
 
-void printsomething(int list[], int n);
-int isforce(double x, double y, double z);
-double averagex(int16_t **list);
-double averagey(int16_t **list);
-double averagez(int16_t **list);
-int isavhigh(int16_t **list);
-int Pqualifier(int16_t **list);
-int highsession();
+void printA(int * a,int l);
+int isforce(int list[][3],int m);
+int caverage(int list[][3],int m, int index);
+int average(int list[][3],int m, int index);
+int isavhigh(int list[][3],int m);
+int Pqualifier(int list[][3],int m);
+void appendArray(int list[][3],int m);
+int* session();

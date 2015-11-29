@@ -1,6 +1,5 @@
 #include <pebble.h>
 #include "extension.h"
-
 static Window *s_main_window;
 static TextLayer *s_time_layer;
 TextLayer *text_layer;
@@ -12,7 +11,7 @@ static int start = 0; //Start/stop the timer
 static int period = -1;
 static int pv = 1; //Change Period Value Here
 static int index =0;
-static int accarray[20][3];
+int accarray[20][3];
 static int i=0;
 static int a[3]={1,2,3};
 
@@ -29,6 +28,7 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   text_layer_set_text(s_time_layer, "Workout Finished");
+  int *final = session();  
   start = 0;
 }
 
@@ -42,24 +42,25 @@ static void click_config_provider(void *context) {
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
  // Increment s_uptime
   if (start==1)
+  {
     s_uptime++;
-  
-  if(period<pv)
-  {
-    period++;
-  }
-  
-  else
-  {
-    //run checkHi/low function
-        
-    period=0;
-    int i;
-    //
-    /*for (i=0;i<25;i++){
-      realloc(accarray[i],0);
-    }*/
-    //realloc(accarray,N);
+    //printf("Second %d",period);
+    if(period<pv)
+    {
+      period++;
+    }
+    else
+    {
+      appendArray(accarray,20);
+      //printf("Output %d",check3);
+      period=0;
+      //int i;
+      
+      /*for (i=0;i<25;i++){
+        realloc(accarray[i],0);
+      }*/
+      //realloc(accarray,N);
+    }
   }
   
   // Use a long-lived buffer
@@ -87,7 +88,7 @@ static void data_handler(AccelData *data, uint32_t num_samples) {
        accarray[index][1] = data[i].y;
        accarray[index][2] = data[i].z;
        
-      // printf("abcd x:%d y:%d z:%d",accarray[index][0],accarray[index][1],accarray[index][2]);
+       //printf("abcd x:%d y:%d z:%d",accarray[index][0],accarray[index][1],accarray[index][2]);
        
     }
     
@@ -155,7 +156,7 @@ void deinit(void) {
 }
 
 int main(void){
-  printsomething(a,3);
+  //printsomething(a,3);
   init();
   app_event_loop();
   deinit();
