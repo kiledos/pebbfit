@@ -18,6 +18,12 @@ static int a[3]={1,2,3};
 int ncounter;
 static int *final;
 
+void out_sent_handler(DictionaryIterator *sent, void *context){}
+static void out_fail_handler(DictionaryIterator *failed, AppMessageResult reason, void* context){}
+
+static void in_received_handler(DictionaryIterator *iter, void* context){}
+
+void in_drop_handler(AppMessageResult reason, void *context){}
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
  text_layer_set_text(s_time_layer, "Workout start"); 
@@ -33,7 +39,7 @@ static void send_next_data()
 	DictionaryIterator *iter;
 	app_message_outbox_begin(&iter);
 
-	for(int i = 0; i < ncounter; i++)
+	for(int i = 0; i < counter; i++)
 	{
 		
 			int value = final[i];
@@ -159,6 +165,13 @@ void init(void) {
   text_layer = text_layer_create(GRect(0, 0, 144, 20));
   window_stack_push(s_main_window, true);
    
+  app_message_register_outbox_sent(out_sent_handler);
+  app_message_register_inbox_received(in_received_handler);
+  app_message_register_inbox_dropped(in_drop_handler);
+  app_message_register_outbox_failed(out_fail_handler);
+
+  // Init buffers
+  app_message_open(64, 64);
  
   //Register click handlers
   window_set_click_config_provider(s_main_window, click_config_provider);

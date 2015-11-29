@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static int counter=0;
+int counter=0;
 static int mode = -1;
 static int array[3000];
 static int ind = 0;
@@ -139,7 +139,7 @@ int* decimalArray(int l)
 int* dataArray(int* decarray, int length)
 {
   int i,current = 0,previous = mode;
-  int lt = 5, ht = 7;
+  int lt = 3, ht = 5;
   int *f = (int*)calloc(length,sizeof(int*));
   f[0] = mode;
   
@@ -186,8 +186,8 @@ int* dataArray(int* decarray, int length)
 int* session(){  
   printA(array,counter);
   int *darray = decimalArray(counter);  
-  int *sessiondata = dataArray(darray,ind); 
-  return sessiondata;
+  //int *sessiondata = dataArray(darray,ind); 
+  return darray;
 }
  
 
