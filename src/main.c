@@ -3,6 +3,7 @@
 static Window *s_main_window;
 static TextLayer *s_time_layer;
 TextLayer *text_layer;
+static int value;
 //static int past[5] ={0,0,0,0,0};
 //static int future[5]={0,0,0,0,0}
 
@@ -14,6 +15,8 @@ static int index =0;
 int accarray[20][3];
 static int i=0;
 static int a[3]={1,2,3};
+int ncounter;
+static int *final;
 
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
@@ -25,11 +28,29 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   s_uptime = 0;
   period = 0;
 }
+static void send_next_data()
+{
+	DictionaryIterator *iter;
+	app_message_outbox_begin(&iter);
+
+	for(int i = 0; i < ncounter; i++)
+	{
+		
+			int value = final[i];
+			Tuplet t = TupletInteger(i, value);
+			dict_write_tuplet(iter, &t);
+		
+	}
+  app_message_outbox_send();
+	
+	
+}
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   text_layer_set_text(s_time_layer, "Workout Finished");
-  int *final = session();  
+  final = session();  
   start = 0;
+  send_next_data();
 }
 
 static void click_config_provider(void *context) {
@@ -126,6 +147,7 @@ static void main_window_load(Window *window) {
 static void main_window_unload(Window *window) {
 text_layer_destroy(s_time_layer);
 }
+
 
 
 void init(void) {

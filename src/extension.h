@@ -1,6 +1,7 @@
 #pragma once
 //extern int accarray[20][3];
 //int *list = &accarray;
+extern int ncounter;
 
 void printA(int * a,int l);
 int isforce(int list[][3],int m);
